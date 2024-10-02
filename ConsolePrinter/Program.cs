@@ -10,7 +10,7 @@ namespace ConsolePrinter
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Simulador Mejorado de Servicio de Impresión");
+            Console.WriteLine("Simulador impresion");
             var service = new ServicePrinter();
 
             while (true)
