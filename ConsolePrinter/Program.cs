@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,60 +11,46 @@ namespace ConsolePrinter
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Simulador impresion");
             var service = new ServicePrinter();
+            string printerName = GetArgumentValue(args, "-p");
+            string getPrinters = GetArgumentValue(args, "-l");
+            string filePath = GetArgumentValue(args, "-f");
 
-            while (true)
+            if (getPrinters != null)
             {
-                Console.WriteLine("\nOpciones:");
-                Console.WriteLine("1. Mostrar impresoras disponibles");
-                Console.WriteLine("2. Seleccionar impresora");
-                Console.WriteLine("3. Establecer ruta de archivo");
-                Console.WriteLine("4. Imprimir archivo");
-                Console.WriteLine("5. Iniciar servicio de impresión automática");
-                Console.WriteLine("6. Detener servicio de impresión automática");
-                Console.WriteLine("7. Salir");
-                Console.Write("Seleccione una opción: ");
-
-                string option = Console.ReadLine();
-
-                switch (option)
-                {
-                    case "1":
-                        service.ShowPrinters();
-                        break;
-                    case "2":
-                        Console.Write("Ingrese el nombre de la impresora: ");
-                        service.SelectPrinter(Console.ReadLine());
-                        break;
-                    case "3":
-                        Console.Write("Ingrese la ruta del archivo: ");
-                        service.SetFilePath(Console.ReadLine());
-                        break;
-                    case "4":
-                        if (!string.IsNullOrEmpty(service.filePath))
-                        {
-                            service.PrintFile(service.filePath);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Primero debe establecer la ruta del archivo.");
-                        }
-                        break;
-                    case "5":
-                        service.Start();
-                        break;
-                    case "6":
-                        service.Stop();
-                        break;
-                    case "7":
-                        service.Stop();
-                        return;
-                    default:
-                        Console.WriteLine("Opción no válida");
-                        break;
-                }
+                service.ShowPrinters();
+                return;
             }
+
+            if (printerName != null && filePath != null)
+            {
+                service.SelectPrinter(printerName);
+                service.SetFilePath(filePath);
+                if (!string.IsNullOrEmpty(service.filePath))
+                {
+                    service.PrintFile(service.filePath);
+                }
+                else
+                {
+                    Console.WriteLine("La ruta del archivo no es válida.");
+                }
+                return;
+            }
+
+            Console.WriteLine("Uso: ConsolePrinter -p <nombre_impresora> -f <ruta_archivo> | -l");
+            Console.WriteLine("-p: Nombre de la impresora");
+            Console.WriteLine("-f: Ruta del archivo a imprimir");
+            Console.WriteLine("-l: Listar impresoras disponibles");
+        }
+
+        static string GetArgumentValue(string[] args, string paramName)
+        {
+            for (int i = 0; i < args.Length - 1; i++)
+            {
+                if (args[i] == paramName)
+                    return args[i + 1];
+            }
+            return null;
         }
     }
 }
